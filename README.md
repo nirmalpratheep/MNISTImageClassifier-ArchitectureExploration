@@ -184,6 +184,13 @@ Output Activation: LogSoftmax
 ## Training Details
 <img width="795" height="524" alt="image" src="https://github.com/user-attachments/assets/355117e7-6852-4ce3-a4fa-853db4eeb11a" />
 
+Epoch 19
+Train: Loss=0.0015 Batch_id=937 Accuracy=99.47: 100%|██████████| 938/938 [00:23<00:00, 39.33it/s]
+Test set: Average loss: 0.0003, Accuracy: 59701/60000 (99.50%)
+
+Epoch 20
+Train: Loss=0.0014 Batch_id=937 Accuracy=99.46: 100%|██████████| 938/938 [00:24<00:00, 38.84it/s]
+Test set: Average loss: 0.0003, Accuracy: 59689/60000 (99.48%)
 
 ## 🚀 Getting Started
 
