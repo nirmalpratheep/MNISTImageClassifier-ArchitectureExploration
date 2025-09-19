@@ -150,6 +150,8 @@ Loss Function: CrossEntropyLoss
 Optimizer: SGD with momentum
 Output Activation: LogSoftmax
 ```
+## Training Plots
+<img width="795" height="524" alt="image" src="https://github.com/user-attachments/assets/4cf40db6-e1b7-4da3-bb17-18b47a075cc9" />
 
 ## 🚀 Getting Started
 
