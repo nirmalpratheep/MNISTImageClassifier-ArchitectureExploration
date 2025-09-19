@@ -66,23 +66,23 @@ Total Parameters: 17,302
 Memory Footprint: 0.69 MB
 ```
 
-### Layer-wise Output Shapes
-| Layer | Input Shape | Output Shape | Parameters |
-|-------|-------------|--------------|------------|
-| Conv2d-1 | [1, 28, 28] | [32, 26, 26] | 320 |
-| BatchNorm2d-2 | [32, 26, 26] | [32, 26, 26] | 64 |
-| Conv2d-3 | [32, 26, 26] | [16, 24, 24] | 4,624 |
-| BatchNorm2d-4 | [16, 24, 24] | [16, 24, 24] | 32 |
-| Conv2d-5 | [16, 24, 24] | [16, 22, 22] | 2,320 |
-| BatchNorm2d-6 | [16, 22, 22] | [16, 22, 22] | 32 |
-| MaxPool2d-7 | [16, 22, 22] | [16, 9, 9] | 0 |
-| Conv2d-8 | [16, 9, 9] | [16, 7, 7] | 2,320 |
-| BatchNorm2d-9 | [16, 7, 7] | [16, 7, 7] | 32 |
-| Conv2d-10 | [16, 7, 7] | [16, 3, 3] | 2,320 |
-| BatchNorm2d-11 | [16, 3, 3] | [16, 3, 3] | 32 |
-| Conv2d-12 | [16, 3, 3] | [12, 3, 3] | 1,740 |
-| BatchNorm2d-13 | [12, 3, 3] | [12, 3, 3] | 24 |
-| Linear-14 | [108] | [10] | 1,090 |
+### Layer-wise Output Shapes & Receptive Fields
+| Layer | Input Shape | Output Shape | Parameters | Receptive Field |
+|-------|-------------|--------------|------------|-----------------|
+| Conv2d-1 | [1, 28, 28] | [32, 26, 26] | 320 | 3×3 |
+| BatchNorm2d-2 | [32, 26, 26] | [32, 26, 26] | 64 | 3×3 |
+| Conv2d-3 | [32, 26, 26] | [16, 24, 24] | 4,624 | 5×5 |
+| BatchNorm2d-4 | [16, 24, 24] | [16, 24, 24] | 32 | 5×5 |
+| Conv2d-5 | [16, 24, 24] | [16, 22, 22] | 2,320 | 7×7 |
+| BatchNorm2d-6 | [16, 22, 22] | [16, 22, 22] | 32 | 7×7 |
+| MaxPool2d-7 | [16, 22, 22] | [16, 9, 9] | 0 | 8×8 |
+| Conv2d-8 | [16, 9, 9] | [16, 7, 7] | 2,320 | 12×12 |
+| BatchNorm2d-9 | [16, 7, 7] | [16, 7, 7] | 32 | 12×12 |
+| Conv2d-10 | [16, 7, 7] | [16, 3, 3] | 2,320 | 20×20 |
+| BatchNorm2d-11 | [16, 3, 3] | [16, 3, 3] | 32 | 20×20 |
+| Conv2d-12 | [16, 3, 3] | [12, 3, 3] | 1,740 | 28×28 |
+| BatchNorm2d-13 | [12, 3, 3] | [12, 3, 3] | 24 | 28×28 |
+| Linear-14 | [108] | [10] | 1,090 | Full Image |
 
 ## 📊 Performance Analysis
 
@@ -108,6 +108,37 @@ Accuracy (%)
 2. **BatchNorm helps**: Adding batch normalization provided consistent training and slight accuracy boost
 3. **Parameter efficiency**: Deeper networks achieved better results with fewer parameters
 4. **Channel progression**: Strategic channel reduction (wide→narrow) improved feature extraction
+5. **Receptive field growth**: The architecture achieves full image receptive field (28×28) by the final conv layer, enabling global feature understanding
+
+## 🔍 Receptive Field Analysis
+
+The receptive field progression in our best model (Exp 5) demonstrates optimal feature extraction:
+
+```
+Layer Progression & Receptive Field Growth:
+Conv1:     3×3  → Local edge detection
+Conv2:     5×5  → Small pattern recognition  
+Conv3:     7×7  → Basic shape features
+MaxPool:   8×8  → Spatial downsampling + RF expansion
+Conv4:    12×12 → Complex pattern detection
+Conv5:    20×20 → Large structure recognition
+Conv6:    28×28 → Full image context (entire digit)
+```
+
+**Why This Matters:**
+- **Early layers** (3×3 to 7×7): Capture local features like edges, curves, and small patterns
+- **Middle layers** (8×8 to 12×12): Detect digit components (loops, lines, intersections)  
+- **Final layers** (20×20 to 28×28): Integrate full digit shape for classification
+
+The architecture reaches **full image receptive field** (28×28) by the final convolutional layer, allowing each output neuron to "see" the entire digit. This is crucial for MNIST where global shape information is essential for distinguishing similar digits (e.g., 6 vs 9, 3 vs 8).
+
+### Receptive Field vs Accuracy Relationship
+| Experiment | Final RF Size | Test Accuracy | Observation |
+|------------|---------------|---------------|-------------|
+| Exp 1-3 | <20×20 | 91.73%-96.43% | Limited global context |
+| Exp 4-5 | 28×28 | 99.25%-99.50% | **Full image context** |
+
+The dramatic accuracy jump in Exp 4-5 correlates with achieving full receptive field coverage, enabling complete digit shape analysis.
 
 ## 💡 Recommendations
 
@@ -150,8 +181,9 @@ Loss Function: CrossEntropyLoss
 Optimizer: SGD with momentum
 Output Activation: LogSoftmax
 ```
-## Training Plots
-<img width="795" height="524" alt="image" src="https://github.com/user-attachments/assets/4cf40db6-e1b7-4da3-bb17-18b47a075cc9" />
+## Training Details
+<img width="795" height="524" alt="image" src="https://github.com/user-attachments/assets/355117e7-6852-4ce3-a4fa-853db4eeb11a" />
+
 
 ## 🚀 Getting Started
 
@@ -159,13 +191,6 @@ Output Activation: LogSoftmax
 ```bash
 pip install torch torchvision numpy matplotlib
 ```
-
-### Quick Start
-```python
-# Clone and run experiment
-git clone https://github.com/yourusername/MNISTImageClassifier-ArchitectureExploration
-
-cd MNISTImageClassifier-ArchitectureExploration
 
 ## 📄 License
 
